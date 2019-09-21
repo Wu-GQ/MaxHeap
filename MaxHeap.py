@@ -8,6 +8,7 @@ class MaxHeap:
         """ 创建新的最大堆 """
         self.max_heap_list = new_list
 
+        # 从第一个非子节点开始调整最大堆
         for i in range((len(self.max_heap_list) - 1) // 2, -1, -1):
             self.adjust_sub_max_heap(i)
 
@@ -20,7 +21,9 @@ class MaxHeap:
         father_node_index = len(self.max_heap_list) - 1
         while father_node_index >= 0:
             father_node_index = (father_node_index - 1) // 2
-            self.adjust_sub_max_heap(father_node_index)
+            # 插入时，当该节点所在的最大堆不需要调整时，则不需要进一步调整其父节点的最大堆
+            if not self.adjust_sub_max_heap(father_node_index):
+                break
 
     def remove_max_node(self) -> int:
         """ 删除并返回最大的节点值 """
@@ -42,10 +45,15 @@ class MaxHeap:
         # 返回最大值
         return max_node
 
-    def adjust_sub_max_heap(self, top_node_index: int):
-        """ 调整以 self.__max_heap_list[top_node_index] 为顶点的最大堆 """
-        if top_node_index < 0:
-            return
+    def adjust_sub_max_heap(self, top_node_index: int) -> bool:
+        """
+        调整以某节点的顶点的最大堆
+        :param top_node_index: 节点所在的序号
+        :return: 是否调整过以该节点为顶点的最大堆
+        """
+        # 当编号小于0或者无子节点时，不需要调整以该节点为顶点的最大堆
+        if top_node_index < 0 or top_node_index > (len(self.max_heap_list) - 1) // 2:
+            return False
 
         left_node_index = 2 * top_node_index + 1
         right_node_index = 2 * top_node_index + 2
@@ -63,6 +71,9 @@ class MaxHeap:
         if max_num_index != top_node_index:
             self.swap_node(max_num_index, top_node_index)
             self.adjust_sub_max_heap(max_num_index)
+            return True
+
+        return False
 
     def swap_node(self, a_node_index: int, b_node_index: int):
         """ 交换两个节点 """
